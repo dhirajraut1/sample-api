@@ -10,26 +10,13 @@ const {
   authenticateToken,
   authorizeRole,
 } = require("../middleware/authMiddleware");
-const { validate, schemas } = require("../middleware/validationMiddleware");
 
 const router = express.Router();
 
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);
-router.post(
-  "/",
-  authenticateToken,
-  authorizeRole(["admin"]),
-  validate(schemas.createProduct),
-  createProduct
-);
-router.put(
-  "/:id",
-  authenticateToken,
-  authorizeRole(["admin"]),
-  validate(schemas.updateProduct),
-  updateProduct
-);
+router.post("/", authenticateToken, authorizeRole(["admin"]), createProduct);
+router.put("/:id", authenticateToken, authorizeRole(["admin"]), updateProduct);
 router.delete(
   "/:id",
   authenticateToken,

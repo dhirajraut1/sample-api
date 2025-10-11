@@ -18,7 +18,7 @@ const register = async (req, res) => {
       return res.status(409).json({ message: "User already exists" });
     }
 
-    // Create new user (password will be hashed in model or here)
+    // Create new user
     const user = await User.createWithHash({
       email,
       password,
@@ -53,12 +53,12 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Please check your credentials" });
     }
 
     const isValidPassword = await user.comparePassword(password);
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid password" });
     }
 
     const token = generateToken(user._id);
@@ -81,7 +81,6 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    // req.user is populated by auth middleware (assumes you decode token and attach user)
     res.json({
       user: {
         id: req.user.id,

@@ -10,11 +10,10 @@ const {
   authenticateToken,
   authorizeRole,
 } = require("../middleware/authMiddleware");
-const { validate, schemas } = require("../middleware/validationMiddleware");
 
 const router = express.Router();
 
-router.post("/", authenticateToken, validate(schemas.createOrder), createOrder);
+router.post("/", authenticateToken, createOrder);
 router.get("/", authenticateToken, authorizeRole(["admin"]), getAllOrders);
 router.get("/my-orders", authenticateToken, getUserOrders);
 router.get("/:id", authenticateToken, getOrderById);

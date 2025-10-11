@@ -6,9 +6,8 @@ const getAllUsers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch users (exclude password for security)
     const users = await User.find()
-      .select("-password") // hide password
+      .select("-password")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -47,16 +46,15 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    // Prevent updating role or password via this endpoint (optional security)
     const { password, ...updateData } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       updateData,
       {
-        new: true, // return updated doc
-        runValidators: true, // enforce schema rules
-        select: "-password", // don't return password
+        new: true,
+        runValidators: true,
+        select: "-password",
       }
     );
 

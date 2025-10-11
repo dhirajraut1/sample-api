@@ -40,16 +40,13 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Static method to create a user (with hashing)
+// Static method to create a user
 userSchema.statics.createWithHash = async function (userData) {
-  const hashedPassword = await bcrypt.hash(userData.password, 10);
-  return this.create({
-    ...userData,
-    password: hashedPassword,
-  });
+  // Let the pre-save hook hash the password
+  return this.create(userData);
 };
 
-// Pre-save hook to prevent re-hashing on update (optional but safe)
+// Pre-save hook to prevent re-hashing on update
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);

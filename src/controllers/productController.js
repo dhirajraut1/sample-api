@@ -44,7 +44,6 @@ const getProductById = async (req, res) => {
     }
     res.json({ product });
   } catch (error) {
-    // Handle invalid ObjectId (e.g., "abc" instead of valid ID)
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid product ID" });
     }
@@ -60,7 +59,6 @@ const createProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    // Handle validation errors (e.g., missing fields, negative price)
     if (error.name === "ValidationError") {
       return res.status(400).json({ message: error.message });
     }
@@ -71,9 +69,9 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, // Return updated doc
-      runValidators: true, // Enforce schema validation
-      overwrite: false, // Don't replace entire doc
+      new: true,
+      runValidators: true,
+      overwrite: false,
     });
 
     if (!product) {
@@ -110,10 +108,8 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// Optional: Update stock (used during order processing)
 const updateStock = async (productId, quantity) => {
   try {
-    // Use $inc to atomically increment/decrement stock
     const product = await Product.findByIdAndUpdate(
       productId,
       { $inc: { stock: quantity } },

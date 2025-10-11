@@ -33,7 +33,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Optional: Add an index on category for faster queries
 productSchema.index({ category: 1 });
 
 const Product = mongoose.model("Product", productSchema);

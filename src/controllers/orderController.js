@@ -1,11 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const User = require("../models/User");
 
 const createOrder = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const { items } = req.body;
     const userId = req.user.id;
@@ -18,7 +14,7 @@ const createOrder = async (req, res) => {
     const productIds = items.map((item) => item.productId);
     const products = await Product.find({
       _id: { $in: productIds },
-    }).session(session);
+    });
 
     const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 
@@ -43,34 +39,25 @@ const createOrder = async (req, res) => {
     }));
 
     // Create the order
-    const order = await Order.create(
-      [
-        {
-          user: userId,
-          items: orderItems,
-          totalAmount,
-        },
-      ],
-      { session }
-    );
+    const order = await Order.create({
+      user: userId,
+      items: orderItems,
+      totalAmount,
+    });
 
     // Update stock for each product
     const stockUpdates = items.map((item) =>
       Product.findByIdAndUpdate(
         item.productId,
         { $inc: { stock: -item.quantity } },
-        { session, new: true }
+        { new: true }
       )
     );
 
     await Promise.all(stockUpdates);
 
-    // Commit transaction
-    await session.commitTransaction();
-    session.endSession();
-
     // Populate product/user info for response
-    const populatedOrder = await Order.findById(order[0]._id)
+    const populatedOrder = await Order.findById(order._id)
       .populate("user", "email firstName lastName")
       .populate("items.product", "name price");
 
@@ -79,9 +66,6 @@ const createOrder = async (req, res) => {
       order: populatedOrder,
     });
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-
     if (error.name === "ValidationError") {
       return res.status(400).json({ message: error.message });
     }
@@ -147,7 +131,6 @@ const getUserOrders = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
   try {
-    // Only admins should access this (enforce in route middleware!)
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;

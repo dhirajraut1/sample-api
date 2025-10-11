@@ -13,7 +13,7 @@ const orderItemSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true, // Price at time of order (snapshot)
+    required: true,
   },
 });
 
@@ -36,11 +36,10 @@ const orderSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt, updatedAt
+    timestamps: true,
   }
 );
 
-// Index for faster user-based queries
 orderSchema.index({ user: 1, createdAt: -1 });
 
 const Order = mongoose.model("Order", orderSchema);

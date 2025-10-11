@@ -2,8 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-
-// Import routes
+const path = require("path");
+const swaggerUi = require("swagger-ui-express");
+const openapi = require("./docs/openapi.json");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -11,6 +12,9 @@ const orderRoutes = require("./routes/orderRoutes");
 const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
+
+// Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
 // Security middleware
 app.use(helmet());
@@ -33,6 +37,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+
+app.get("/openapi.json", (req, res) => {
+  res.sendFile(path.join(__dirname, "docs", "openapi.json"));
+});
+
+// Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
 // Health check endpoint
 app.get("/health", (req, res) => {
