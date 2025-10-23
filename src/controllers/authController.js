@@ -12,10 +12,19 @@ const register = async (req, res) => {
   try {
     const { email, password, firstName, lastName, role } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    // Check if user already exists and is not soft-deleted
+    const existingUser = await User.findOne({ email, isDeleted: false });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
+    }
+
+    //Check if user is deleted
+    const deletedUser = await User.findOne({ email, isDeleted: true });
+    if (deletedUser) {
+      return res.status(400).json({
+        message:
+          "This email was previously used and please contact support to reactivate your account.",
+      });
     }
 
     // Create new user

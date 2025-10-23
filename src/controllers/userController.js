@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Order = require("../models/Order");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -80,18 +81,33 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    // Check if user is deleting themselves
-    if (req.user.id === req.params.id) {
+    // Prevent a user from deleting their own account
+    if (req.user && req.user.id === req.params.id) {
       return res
         .status(400)
         .json({ message: "Users cannot delete their own account" });
     }
 
-    const user = await User.findByIdAndDelete(req.params.id);
+    // Prevent deletion if the user has any orders referencing them
+    const activeOrders = await Order.find({ "user._id": req.params.id }).limit(
+      1
+    );
+    if (activeOrders.length > 0) {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete user with active orders" });
+    }
+
+    // Verify user exists
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ message: "User deleted successfully" });
+
+    // Soft delete the user
+    await User.findByIdAndUpdate(req.params.id, { isDeleted: true });
+
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid user ID" });

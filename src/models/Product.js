@@ -27,6 +27,10 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt
