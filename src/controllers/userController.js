@@ -80,6 +80,13 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
+    // Check if user is deleting themselves
+    if (req.user.id === req.params.id) {
+      return res
+        .status(400)
+        .json({ message: "Users cannot delete their own account" });
+    }
+
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
