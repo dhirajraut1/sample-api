@@ -16,6 +16,7 @@ const getAllUsers = async (req, res) => {
     const total = await User.countDocuments();
 
     res.json({
+      message: "Users retrieved successfully",
       users,
       pagination: {
         page,
@@ -35,7 +36,7 @@ const getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ user });
+    res.json({ message: "User retrieved successfully", user });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid user ID" });

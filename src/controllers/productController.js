@@ -23,6 +23,7 @@ const getAllProducts = async (req, res) => {
     const total = await Product.countDocuments(filter);
 
     res.json({
+      message: "Products retrieved successfully",
       products,
       pagination: {
         page,
@@ -42,7 +43,7 @@ const getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    res.json({ product });
+    res.json({ message: "Product retrieved successfully", product });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid product ID" });
@@ -99,7 +100,7 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    res.json({ message: "Product deleted successfully" });
+    res.json({ message: "Product deleted successfully", product });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid product ID" });

@@ -91,7 +91,7 @@ const getOrderById = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    res.json({ order });
+    res.json({ message: "Order retrieved successfully", order });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid order ID" });
@@ -116,6 +116,7 @@ const getUserOrders = async (req, res) => {
     const total = await Order.countDocuments({ user: req.user.id });
 
     res.json({
+      message: "Orders retrieved successfully",
       orders,
       pagination: {
         page,
@@ -145,6 +146,7 @@ const getAllOrders = async (req, res) => {
     const total = await Order.countDocuments();
 
     res.json({
+      message: "Orders retrieved successfully",
       orders,
       pagination: {
         page,
@@ -183,7 +185,7 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    res.json({ message: "Order status updated successfully" });
+    res.json({ message: "Order status updated successfully", order });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({ message: "Invalid order ID" });

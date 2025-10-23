@@ -10,7 +10,7 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -24,6 +24,7 @@ const register = async (req, res) => {
       password,
       firstName,
       lastName,
+      role,
     });
 
     const token = generateToken(user._id);
@@ -36,6 +37,7 @@ const register = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -97,12 +99,13 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, role } = req.body;
     const updates = {};
 
     if (firstName !== undefined) updates.firstName = firstName;
     if (lastName !== undefined) updates.lastName = lastName;
     if (email !== undefined) updates.email = email;
+    if (role !== undefined) updates.role = role;
 
     const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
       new: true,
@@ -120,6 +123,7 @@ const updateProfile = async (req, res) => {
         email: updatedUser.email,
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
+        role: updatedUser.role,
       },
     });
   } catch (error) {
